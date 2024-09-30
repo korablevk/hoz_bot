@@ -1,18 +1,24 @@
+import sys
 from logging.config import fileConfig
+from os.path import abspath, dirname
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
+sys.path.insert(0, dirname(dirname(dirname(abspath(__file__)))))
+
 from alembic import context
 
-from hozbot.database.engine import Base, DATABASE_URL
-from hozbot.models.birds_model import Birds
+from hozbot.models.birds_model import Birds  # noqa
 from hozbot.models.shop_model import Shop
+from hozbot.config import settings
+from hozbot.database.engine import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-config.set_main_option('sqlalchemy.url', f'{DATABASE_URL}?async_fallback=True')
+
+config.set_main_option("sqlalchemy.url", f"{settings.DATABASE_URL}?async_fallback=True")
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

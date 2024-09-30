@@ -9,6 +9,8 @@ services:
       - .env-non-dev
     volumes:
       - pgdata:/var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
     expose:
       - 5432
     deploy:
@@ -46,10 +48,10 @@ services:
       app_redis:
         condition: service_started
     # Если не работает эта команда, используйте закомментированную
-    # command: ["/booking/docker/app.sh"]
-    command: sh -c "migrations upgrade head && python /hozbot/main.py"
+    command: ["./scripts/start-prod.sh"]
+#    command: sh -c "alembic upgrade head && python /hozbot/main.py" #alembic upgrade f440567734cb &&
     ports:
-      - 8000:8000
+      - "8000:8000"
 
 
 volumes:
