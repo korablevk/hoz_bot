@@ -1,0 +1,60 @@
+version: "3.8"
+services:
+
+  app_db:
+    image: postgres:15
+    container_name: library-bot-postgresql
+    restart: always
+    env_file:
+      - .env-non-dev
+    volumes:
+      - pgdata:/var/lib/postgresql/data/pgdata
+    expose:
+      - 5432
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - postgres-db-network
+
+  app_redis:
+    image: redis:7
+    container_name: library-bot-redis
+    restart: always
+
+  app:
+    image: library-bot
+    restart: always
+    build:
+      context: .
+    container_name: library-bot
+    env_file:
+      - .env-non-dev
+    depends_on:
+      app_db:
+          condition: service_healthy
+      app_redis:
+        condition: service_started
+    # Если не работает эта команда, используйте закомментированную
+    # command: ["/booking/docker/app.sh"]
+    command: sh -c "migrations upgrade head && python /hozbot/main.py"
+    ports:
+      - 8000:8000
+
+
+volumes:
+  pgdata:
+
+networks:
+    postgres-db-network:
+        driver: bridge

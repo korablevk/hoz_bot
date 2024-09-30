@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "hoz-bot"
+version = "0.1.0"
+description = "Telegram bot to order birds"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+aiogram = "^3.10.0"
+aiogram-dialog = "^2.1.0"
+pydantic-settings = "^2.3.4"
+environs = "^11.0.0"
+redis = "^5.0.7"
+sqlalchemy = "^2.0.31"
+alembic = "^1.13.2"
+asyncpg = "^0.29.0"
+greenlet = "^3.0.3"
+aiocache = "^0.12.2"
+sqladmin = "^0.18.0"
+fastapi = "^0.112.0"
+uvicorn = "^0.30.6"
+ngrok = "^1.4.0"
+motor = "^3.5.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
