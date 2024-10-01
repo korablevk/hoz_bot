@@ -1,18 +1,19 @@
-version: "3.8"
+version: '3.8'
+
 services:
 
   app_db:
     image: postgres:15
     container_name: library-bot-postgresql
-    restart: always
+    restart: "unless-stopped"
+    hostname: postgres
     env_file:
       - .env-non-dev
-    volumes:
-      - pgdata:/var/lib/postgresql/data/pgdata
     ports:
       - "5432:5432"
-    expose:
-      - 5432
+    volumes:
+      - ../2. Init Database:/docker-entrypoint-initdb.d
+      - .:/var/lib/postgresql/data
     deploy:
       resources:
         limits:
@@ -22,41 +23,45 @@ services:
           cpus: '0.25'
           memory: 256M
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - postgres-db-network
+        test: [ "CMD-SHELL", "pg_isready" ]
+        interval: 30s
+        timeout: 10s
+        retries: 5
 
   app_redis:
-    image: redis:7
+    image: redis:7.0-alpine
+    restart: "unless-stopped"
+    hostname: redis
     container_name: library-bot-redis
-    restart: always
+    command:
+      - 'redis-server'
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
 
   app:
-    image: library-bot
-    restart: always
-    build:
-      context: .
     container_name: library-bot
+    image: library-bot
+    restart: "unless-stopped"
     env_file:
       - .env-non-dev
+    build:
+      context: .
+    command: sh -c "alembic upgrade head && python /hozbot/main.py"
+    volumes:
+      - .:/code
     depends_on:
-      app_db:
-          condition: service_healthy
-      app_redis:
-        condition: service_started
-    # Если не работает эта команда, используйте закомментированную
-    command: ["./scripts/start-prod.sh"]
-#    command: sh -c "alembic upgrade head && python /hozbot/main.py" #alembic upgrade f440567734cb &&
+      - app_db
+      - app_redis
     ports:
-      - "8000:8000"
-
+      - 8000:8000
 
 volumes:
-  pgdata:
+  app_pg_data:
+  redis-data:
+
 
 networks:
-    postgres-db-network:
-        driver: bridge
+  default:
+    name: app_main

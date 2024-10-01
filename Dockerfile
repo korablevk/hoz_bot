@@ -14,6 +14,5 @@ COPY . ./
 ENV PYTHONPATH "${PYTHONPATH}:/Hoz_bot"
 
 #RUN alembic upgrade head
-#CMD ["./scripts/makemigrations.sh"]
-#CMD ["./scripts/migrate.sh"]
+#CMD ["./scripts/start-prod.sh"]
 CMD ["python3", "/hozbot/main.py"]

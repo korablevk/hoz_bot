@@ -2,6 +2,5 @@
 
 set -e
 
-alembic revision -m "$1" --autogenerate
-alembic upgrade head
-exec poetry run python hozbot/main.py
+export DEBUG=False
+exec poetry run python hozbot/bot.py
